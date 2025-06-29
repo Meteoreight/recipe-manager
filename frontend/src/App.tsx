@@ -7,6 +7,7 @@ import RecipeForm from './pages/RecipeForm';
 import IngredientList from './pages/IngredientList';
 import ProductList from './pages/ProductList';
 import PurchaseHistory from './pages/PurchaseHistory';
+import EggMasterList from './components/EggMasterList';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/ingredients" element={<IngredientList />} />
           <Route path="/products" element={<ProductList />} />
           <Route path="/purchase-history" element={<PurchaseHistory />} />
+          <Route path="/egg-master" element={<EggMasterList />} />
         </Routes>
       </Layout>
     </Router>

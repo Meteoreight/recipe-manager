@@ -1,3 +1,12 @@
+export interface EggMaster {
+  egg_id: number;
+  whole_egg_weight: string;
+  egg_white_weight: string;
+  egg_yolk_weight: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface RecipeCategory {
   category_id: number;
   category: string;
@@ -26,6 +35,8 @@ export interface Recipe {
   effort?: number;
   batch_size: number;
   batch_unit: string;
+  yield_per_batch: number;
+  yield_unit: string;
   status: 'draft' | 'active' | 'archived';
   created_at: string;
   updated_at: string;
@@ -38,6 +49,7 @@ export interface RecipeDetail {
   usage_amount: string;
   usage_unit: string;
   display_order: number;
+  egg_type?: 'whole_egg' | 'egg_white' | 'egg_yolk';
   created_at: string;
   updated_at: string;
 }
@@ -49,7 +61,6 @@ export interface Product {
   pieces_per_package: number;
   packaging_material_id?: number;
   shelf_life_days?: number;
-  yield_per_batch: number;
   selling_price?: string;
   status: 'under_review' | 'trial' | 'selling' | 'discontinued';
   created_at: string;

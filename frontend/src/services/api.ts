@@ -54,6 +54,27 @@ class ApiService {
     return this.post('/recipe-categories/', data);
   }
 
+  // Egg Master
+  getEggMasters() {
+    return this.get<any[]>('/egg-master/');
+  }
+
+  createEggMaster(data: any) {
+    return this.post<any>('/egg-master/', data);
+  }
+
+  getEggMaster(id: number) {
+    return this.get<any>(`/egg-master/${id}`);
+  }
+
+  updateEggMaster(id: number, data: any) {
+    return this.put<any>(`/egg-master/${id}`, data);
+  }
+
+  deleteEggMaster(id: number) {
+    return this.delete<any>(`/egg-master/${id}`);
+  }
+
   // Ingredients
   getIngredients() {
     return this.get('/ingredients/');

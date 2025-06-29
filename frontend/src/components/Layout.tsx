@@ -63,6 +63,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               >
                 仕入れ履歴
               </Link>
+              <Link
+                to="/egg-master"
+                className={`px-3 py-2 rounded-md text-sm font-medium ${
+                  isActive('/egg-master') ? 'bg-gray-900' : 'hover:bg-gray-700'
+                }`}
+              >
+                卵マスタ
+              </Link>
             </div>
           </div>
         </div>
