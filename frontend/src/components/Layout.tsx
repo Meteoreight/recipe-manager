@@ -32,6 +32,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 ホーム
               </Link>
               <Link
+                to="/dashboard"
+                className={`px-3 py-2 rounded-md text-sm font-medium ${
+                  isActive('/dashboard') ? 'bg-gray-900' : 'hover:bg-gray-700'
+                }`}
+              >
+                ダッシュボード
+              </Link>
+              <Link
                 to="/recipes"
                 className={`px-3 py-2 rounded-md text-sm font-medium ${
                   isActive('/recipes') ? 'bg-gray-900' : 'hover:bg-gray-700'

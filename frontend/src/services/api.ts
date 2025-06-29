@@ -122,6 +122,10 @@ class ApiService {
     return this.get<any[]>(`/recipes/${recipeId}/details`);
   }
 
+  getBatchRecipeDetails(recipeIds: number[]) {
+    return this.post<{[recipeId: string]: any[]}>('/recipes/batch-details', recipeIds);
+  }
+
   createRecipeDetail(data: any) {
     return this.post<any>('/recipe-details/', data);
   }

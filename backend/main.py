@@ -238,6 +238,28 @@ def read_recipe_details(recipe_id: int, db: Session = Depends(get_db)):
     details = db.query(models.RecipeDetail).filter(models.RecipeDetail.recipe_id == recipe_id).order_by(models.RecipeDetail.display_order).all()
     return details
 
+@app.post("/recipes/batch-details", response_model=dict)
+def read_batch_recipe_details(recipe_ids: List[int], db: Session = Depends(get_db)):
+    """
+    Get recipe details for multiple recipes in a single request.
+    Returns a dictionary with recipe_id as key and list of details as value.
+    """
+    if not recipe_ids:
+        return {}
+    
+    details = db.query(models.RecipeDetail).filter(
+        models.RecipeDetail.recipe_id.in_(recipe_ids)
+    ).order_by(models.RecipeDetail.recipe_id, models.RecipeDetail.display_order).all()
+    
+    # Group details by recipe_id
+    result = {}
+    for detail in details:
+        if detail.recipe_id not in result:
+            result[detail.recipe_id] = []
+        result[detail.recipe_id].append(detail)
+    
+    return result
+
 # Recipe Details endpoints
 @app.post("/recipe-details/", response_model=schemas.RecipeDetail)
 def create_recipe_detail(detail: schemas.RecipeDetailCreate, db: Session = Depends(get_db)):
