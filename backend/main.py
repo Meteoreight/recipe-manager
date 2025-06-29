@@ -304,6 +304,37 @@ def read_packaging_materials(skip: int = 0, limit: int = 100, db: Session = Depe
     materials = db.query(models.PackagingMaterial).offset(skip).limit(limit).all()
     return materials
 
+@app.get("/packaging-materials/{material_id}", response_model=schemas.PackagingMaterial)
+def read_packaging_material(material_id: int, db: Session = Depends(get_db)):
+    material = db.query(models.PackagingMaterial).filter(models.PackagingMaterial.packaging_material_id == material_id).first()
+    if material is None:
+        raise HTTPException(status_code=404, detail="Packaging material not found")
+    return material
+
+@app.put("/packaging-materials/{material_id}", response_model=schemas.PackagingMaterial)
+def update_packaging_material(material_id: int, material: schemas.PackagingMaterialUpdate, db: Session = Depends(get_db)):
+    db_material = db.query(models.PackagingMaterial).filter(models.PackagingMaterial.packaging_material_id == material_id).first()
+    if db_material is None:
+        raise HTTPException(status_code=404, detail="Packaging material not found")
+    
+    update_data = material.dict(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(db_material, field, value)
+    
+    db.commit()
+    db.refresh(db_material)
+    return db_material
+
+@app.delete("/packaging-materials/{material_id}")
+def delete_packaging_material(material_id: int, db: Session = Depends(get_db)):
+    db_material = db.query(models.PackagingMaterial).filter(models.PackagingMaterial.packaging_material_id == material_id).first()
+    if db_material is None:
+        raise HTTPException(status_code=404, detail="Packaging material not found")
+    
+    db.delete(db_material)
+    db.commit()
+    return {"ok": True}
+
 # Products endpoints
 @app.post("/products/", response_model=schemas.Product)
 def create_product(product: schemas.ProductCreate, db: Session = Depends(get_db)):
@@ -324,6 +355,30 @@ def read_product(product_id: int, db: Session = Depends(get_db)):
     if product is None:
         raise HTTPException(status_code=404, detail="Product not found")
     return product
+
+@app.put("/products/{product_id}", response_model=schemas.Product)
+def update_product(product_id: int, product: schemas.ProductUpdate, db: Session = Depends(get_db)):
+    db_product = db.query(models.Product).filter(models.Product.product_id == product_id).first()
+    if db_product is None:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    update_data = product.dict(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(db_product, field, value)
+    
+    db.commit()
+    db.refresh(db_product)
+    return db_product
+
+@app.delete("/products/{product_id}")
+def delete_product(product_id: int, db: Session = Depends(get_db)):
+    db_product = db.query(models.Product).filter(models.Product.product_id == product_id).first()
+    if db_product is None:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    db.delete(db_product)
+    db.commit()
+    return {"ok": True}
 
 if __name__ == "__main__":
     import uvicorn

@@ -147,6 +147,14 @@ class ApiService {
     return this.get(`/products/${id}`);
   }
 
+  updateProduct(id: number, data: any) {
+    return this.put(`/products/${id}`, data);
+  }
+
+  deleteProduct(id: number) {
+    return this.delete(`/products/${id}`);
+  }
+
   // Purchase History
   getPurchaseHistory() {
     return this.get<any[]>('/purchase-history/');
@@ -171,6 +179,18 @@ class ApiService {
 
   createPackagingMaterial(data: any) {
     return this.post('/packaging-materials/', data);
+  }
+
+  getPackagingMaterial(id: number) {
+    return this.get(`/packaging-materials/${id}`);
+  }
+
+  updatePackagingMaterial(id: number, data: any) {
+    return this.put(`/packaging-materials/${id}`, data);
+  }
+
+  deletePackagingMaterial(id: number) {
+    return this.delete(`/packaging-materials/${id}`);
   }
 }
 
