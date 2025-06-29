@@ -3,6 +3,28 @@ from typing import Optional, List
 from datetime import date, datetime
 from decimal import Decimal
 
+# Egg Master Schemas
+class EggMasterBase(BaseModel):
+    whole_egg_weight: Decimal = Field(default=Decimal('50.00'), ge=0, le=999.99)
+    egg_white_weight: Decimal = Field(default=Decimal('30.00'), ge=0, le=999.99)
+    egg_yolk_weight: Decimal = Field(default=Decimal('20.00'), ge=0, le=999.99)
+
+class EggMasterCreate(EggMasterBase):
+    pass
+
+class EggMasterUpdate(EggMasterBase):
+    whole_egg_weight: Optional[Decimal] = Field(None, ge=0, le=999.99)
+    egg_white_weight: Optional[Decimal] = Field(None, ge=0, le=999.99)
+    egg_yolk_weight: Optional[Decimal] = Field(None, ge=0, le=999.99)
+
+class EggMaster(EggMasterBase):
+    egg_id: int
+    created_at: datetime
+    updated_at: datetime
+    
+    class Config:
+        from_attributes = True
+
 # Recipe Category Schemas
 class RecipeCategoryBase(BaseModel):
     category: str = Field(..., max_length=100)
@@ -51,9 +73,9 @@ class Ingredient(IngredientBase):
 class PurchaseHistoryBase(BaseModel):
     purchase_date: date
     ingredient_id: int
-    price_excluding_tax: Decimal = Field(..., max_digits=10, decimal_places=2)
-    tax_rate: Decimal = Field(default=Decimal('0.10'), max_digits=5, decimal_places=4)
-    discount_rate: Optional[Decimal] = Field(default=Decimal('0.00'), max_digits=5, decimal_places=4)
+    price_excluding_tax: Decimal = Field(..., ge=0, le=99999999.99)
+    tax_rate: Decimal = Field(default=Decimal('0.10'), ge=0, le=1.0)
+    discount_rate: Optional[Decimal] = Field(default=Decimal('0.00'), ge=0, le=1.0)
     supplier: Optional[str] = Field(None, max_length=200)
 
 class PurchaseHistoryCreate(PurchaseHistoryBase):
@@ -62,7 +84,7 @@ class PurchaseHistoryCreate(PurchaseHistoryBase):
 class PurchaseHistoryUpdate(PurchaseHistoryBase):
     purchase_date: Optional[date] = None
     ingredient_id: Optional[int] = None
-    price_excluding_tax: Optional[Decimal] = Field(None, max_digits=10, decimal_places=2)
+    price_excluding_tax: Optional[Decimal] = Field(None, ge=0, le=99999999.99)
 
 class PurchaseHistory(PurchaseHistoryBase):
     id: int
@@ -81,7 +103,9 @@ class RecipeBase(BaseModel):
     effort: Optional[int] = Field(None, ge=1, le=5)
     batch_size: int = Field(..., gt=0)
     batch_unit: str = Field(default='pieces', max_length=50)
-    status: str = Field(default='draft', regex='^(draft|active|archived)$')
+    yield_per_batch: int = Field(..., gt=0)
+    yield_unit: str = Field(default='pieces', max_length=50)
+    status: str = Field(default='draft', pattern=r'^(draft|active|archived)$')
 
 class RecipeCreate(RecipeBase):
     pass
@@ -89,6 +113,7 @@ class RecipeCreate(RecipeBase):
 class RecipeUpdate(RecipeBase):
     recipe_name: Optional[str] = Field(None, max_length=200)
     batch_size: Optional[int] = Field(None, gt=0)
+    yield_per_batch: Optional[int] = Field(None, gt=0)
 
 class Recipe(RecipeBase):
     recipe_id: int
@@ -102,9 +127,10 @@ class Recipe(RecipeBase):
 class RecipeDetailBase(BaseModel):
     recipe_id: int
     ingredient_id: int
-    usage_amount: Decimal = Field(..., max_digits=10, decimal_places=3)
+    usage_amount: Decimal = Field(..., ge=0, le=9999999.999)
     usage_unit: str = Field(..., max_length=50)
     display_order: int = Field(..., ge=1)
+    egg_type: Optional[str] = Field(None, pattern=r'^(whole_egg|egg_white|egg_yolk)$')
 
 class RecipeDetailCreate(RecipeDetailBase):
     pass
@@ -112,7 +138,7 @@ class RecipeDetailCreate(RecipeDetailBase):
 class RecipeDetailUpdate(RecipeDetailBase):
     recipe_id: Optional[int] = None
     ingredient_id: Optional[int] = None
-    usage_amount: Optional[Decimal] = Field(None, max_digits=10, decimal_places=3)
+    usage_amount: Optional[Decimal] = Field(None, ge=0, le=9999999.999)
     usage_unit: Optional[str] = Field(None, max_length=50)
     display_order: Optional[int] = Field(None, ge=1)
 
@@ -156,9 +182,8 @@ class ProductBase(BaseModel):
     pieces_per_package: int = Field(..., gt=0)
     packaging_material_id: Optional[int] = None
     shelf_life_days: Optional[int] = Field(None, gt=0)
-    yield_per_batch: int = Field(..., gt=0)
-    selling_price: Optional[Decimal] = Field(None, max_digits=10, decimal_places=2)
-    status: str = Field(default='under_review', regex='^(under_review|trial|selling|discontinued)$')
+    selling_price: Optional[Decimal] = Field(None, ge=0, le=99999999.99)
+    status: str = Field(default='under_review', pattern=r'^(under_review|trial|selling|discontinued)$')
 
 class ProductCreate(ProductBase):
     pass
@@ -166,7 +191,6 @@ class ProductCreate(ProductBase):
 class ProductUpdate(ProductBase):
     product_name: Optional[str] = Field(None, max_length=200)
     pieces_per_package: Optional[int] = Field(None, gt=0)
-    yield_per_batch: Optional[int] = Field(None, gt=0)
 
 class Product(ProductBase):
     product_id: int

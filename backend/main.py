@@ -29,6 +29,51 @@ def read_root():
 def health_check():
     return {"status": "healthy"}
 
+# Egg Master endpoints
+@app.post("/egg-master/", response_model=schemas.EggMaster)
+def create_egg_master(egg_master: schemas.EggMasterCreate, db: Session = Depends(get_db)):
+    db_egg_master = models.EggMaster(**egg_master.dict())
+    db.add(db_egg_master)
+    db.commit()
+    db.refresh(db_egg_master)
+    return db_egg_master
+
+@app.get("/egg-master/", response_model=List[schemas.EggMaster])
+def read_egg_masters(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    egg_masters = db.query(models.EggMaster).offset(skip).limit(limit).all()
+    return egg_masters
+
+@app.get("/egg-master/{egg_id}", response_model=schemas.EggMaster)
+def read_egg_master(egg_id: int, db: Session = Depends(get_db)):
+    egg_master = db.query(models.EggMaster).filter(models.EggMaster.egg_id == egg_id).first()
+    if egg_master is None:
+        raise HTTPException(status_code=404, detail="Egg master not found")
+    return egg_master
+
+@app.put("/egg-master/{egg_id}", response_model=schemas.EggMaster)
+def update_egg_master(egg_id: int, egg_master: schemas.EggMasterUpdate, db: Session = Depends(get_db)):
+    db_egg_master = db.query(models.EggMaster).filter(models.EggMaster.egg_id == egg_id).first()
+    if db_egg_master is None:
+        raise HTTPException(status_code=404, detail="Egg master not found")
+    
+    update_data = egg_master.dict(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(db_egg_master, field, value)
+    
+    db.commit()
+    db.refresh(db_egg_master)
+    return db_egg_master
+
+@app.delete("/egg-master/{egg_id}")
+def delete_egg_master(egg_id: int, db: Session = Depends(get_db)):
+    db_egg_master = db.query(models.EggMaster).filter(models.EggMaster.egg_id == egg_id).first()
+    if db_egg_master is None:
+        raise HTTPException(status_code=404, detail="Egg master not found")
+    
+    db.delete(db_egg_master)
+    db.commit()
+    return {"message": "Egg master deleted successfully"}
+
 # Recipe Categories endpoints
 @app.post("/recipe-categories/", response_model=schemas.RecipeCategory)
 def create_recipe_category(category: schemas.RecipeCategoryCreate, db: Session = Depends(get_db)):

@@ -44,6 +44,16 @@ class PurchaseHistory(Base):
     
     ingredient = relationship("Ingredient", back_populates="purchase_history")
 
+class EggMaster(Base):
+    __tablename__ = "egg_master"
+    
+    egg_id = Column(Integer, primary_key=True, index=True)
+    whole_egg_weight = Column(DECIMAL(5,2), nullable=False, default=50.00)
+    egg_white_weight = Column(DECIMAL(5,2), nullable=False, default=30.00)
+    egg_yolk_weight = Column(DECIMAL(5,2), nullable=False, default=20.00)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
 class PackagingMaterial(Base):
     __tablename__ = "packaging_materials"
     
@@ -70,7 +80,9 @@ class Recipe(Base):
     effort = Column(Integer, CheckConstraint('effort >= 1 AND effort <= 5'))
     batch_size = Column(Integer, nullable=False)
     batch_unit = Column(String(50), nullable=False, default='pieces')
-    status = Column(String(20), default='draft', CheckConstraint("status IN ('draft', 'active', 'archived')"))
+    yield_per_batch = Column(Integer, nullable=False)
+    yield_unit = Column(String(50), nullable=False, default='pieces')
+    status = Column(String(20), CheckConstraint("status IN ('draft', 'active', 'archived')"), default='draft')
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
     
@@ -87,6 +99,7 @@ class RecipeDetail(Base):
     usage_amount = Column(DECIMAL(10,3), nullable=False)
     usage_unit = Column(String(50), nullable=False)
     display_order = Column(Integer, nullable=False)
+    egg_type = Column(String(20), CheckConstraint("egg_type IN ('whole_egg', 'egg_white', 'egg_yolk')"), nullable=True)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
     
@@ -102,9 +115,8 @@ class Product(Base):
     pieces_per_package = Column(Integer, nullable=False)
     packaging_material_id = Column(Integer, ForeignKey("packaging_materials.packaging_material_id"))
     shelf_life_days = Column(Integer)
-    yield_per_batch = Column(Integer, nullable=False)
     selling_price = Column(DECIMAL(10,2))
-    status = Column(String(20), default='under_review', CheckConstraint("status IN ('under_review', 'trial', 'selling', 'discontinued')"))
+    status = Column(String(20), CheckConstraint("status IN ('under_review', 'trial', 'selling', 'discontinued')"), default='under_review')
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
     
