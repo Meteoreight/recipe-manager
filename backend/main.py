@@ -1,0 +1,160 @@
+from fastapi import FastAPI, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
+from typing import List
+
+from database import SessionLocal, engine, get_db
+from models import Base
+import models
+import schemas
+
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(title="Recipe Manager API", version="1.0.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3006", "http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Health check endpoint
+@app.get("/")
+def read_root():
+    return {"message": "Recipe Manager API is running"}
+
+@app.get("/health")
+def health_check():
+    return {"status": "healthy"}
+
+# Recipe Categories endpoints
+@app.post("/recipe-categories/", response_model=schemas.RecipeCategory)
+def create_recipe_category(category: schemas.RecipeCategoryCreate, db: Session = Depends(get_db)):
+    db_category = models.RecipeCategory(**category.dict())
+    db.add(db_category)
+    db.commit()
+    db.refresh(db_category)
+    return db_category
+
+@app.get("/recipe-categories/", response_model=List[schemas.RecipeCategory])
+def read_recipe_categories(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    categories = db.query(models.RecipeCategory).offset(skip).limit(limit).all()
+    return categories
+
+@app.get("/recipe-categories/{category_id}", response_model=schemas.RecipeCategory)
+def read_recipe_category(category_id: int, db: Session = Depends(get_db)):
+    category = db.query(models.RecipeCategory).filter(models.RecipeCategory.category_id == category_id).first()
+    if category is None:
+        raise HTTPException(status_code=404, detail="Recipe category not found")
+    return category
+
+# Ingredients endpoints
+@app.post("/ingredients/", response_model=schemas.Ingredient)
+def create_ingredient(ingredient: schemas.IngredientCreate, db: Session = Depends(get_db)):
+    db_ingredient = models.Ingredient(**ingredient.dict())
+    db.add(db_ingredient)
+    db.commit()
+    db.refresh(db_ingredient)
+    return db_ingredient
+
+@app.get("/ingredients/", response_model=List[schemas.Ingredient])
+def read_ingredients(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    ingredients = db.query(models.Ingredient).offset(skip).limit(limit).all()
+    return ingredients
+
+@app.get("/ingredients/{ingredient_id}", response_model=schemas.Ingredient)
+def read_ingredient(ingredient_id: int, db: Session = Depends(get_db)):
+    ingredient = db.query(models.Ingredient).filter(models.Ingredient.ingredient_id == ingredient_id).first()
+    if ingredient is None:
+        raise HTTPException(status_code=404, detail="Ingredient not found")
+    return ingredient
+
+# Purchase History endpoints
+@app.post("/purchase-history/", response_model=schemas.PurchaseHistory)
+def create_purchase_history(purchase: schemas.PurchaseHistoryCreate, db: Session = Depends(get_db)):
+    db_purchase = models.PurchaseHistory(**purchase.dict())
+    db.add(db_purchase)
+    db.commit()
+    db.refresh(db_purchase)
+    return db_purchase
+
+@app.get("/purchase-history/", response_model=List[schemas.PurchaseHistory])
+def read_purchase_history(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    purchases = db.query(models.PurchaseHistory).offset(skip).limit(limit).all()
+    return purchases
+
+# Recipes endpoints
+@app.post("/recipes/", response_model=schemas.Recipe)
+def create_recipe(recipe: schemas.RecipeCreate, db: Session = Depends(get_db)):
+    db_recipe = models.Recipe(**recipe.dict())
+    db.add(db_recipe)
+    db.commit()
+    db.refresh(db_recipe)
+    return db_recipe
+
+@app.get("/recipes/", response_model=List[schemas.Recipe])
+def read_recipes(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    recipes = db.query(models.Recipe).offset(skip).limit(limit).all()
+    return recipes
+
+@app.get("/recipes/{recipe_id}", response_model=schemas.Recipe)
+def read_recipe(recipe_id: int, db: Session = Depends(get_db)):
+    recipe = db.query(models.Recipe).filter(models.Recipe.recipe_id == recipe_id).first()
+    if recipe is None:
+        raise HTTPException(status_code=404, detail="Recipe not found")
+    return recipe
+
+# Recipe Details endpoints
+@app.post("/recipe-details/", response_model=schemas.RecipeDetail)
+def create_recipe_detail(detail: schemas.RecipeDetailCreate, db: Session = Depends(get_db)):
+    db_detail = models.RecipeDetail(**detail.dict())
+    db.add(db_detail)
+    db.commit()
+    db.refresh(db_detail)
+    return db_detail
+
+@app.get("/recipe-details/recipe/{recipe_id}", response_model=List[schemas.RecipeDetail])
+def read_recipe_details(recipe_id: int, db: Session = Depends(get_db)):
+    details = db.query(models.RecipeDetail).filter(models.RecipeDetail.recipe_id == recipe_id).order_by(models.RecipeDetail.display_order).all()
+    return details
+
+# Packaging Materials endpoints
+@app.post("/packaging-materials/", response_model=schemas.PackagingMaterial)
+def create_packaging_material(material: schemas.PackagingMaterialCreate, db: Session = Depends(get_db)):
+    db_material = models.PackagingMaterial(**material.dict())
+    db.add(db_material)
+    db.commit()
+    db.refresh(db_material)
+    return db_material
+
+@app.get("/packaging-materials/", response_model=List[schemas.PackagingMaterial])
+def read_packaging_materials(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    materials = db.query(models.PackagingMaterial).offset(skip).limit(limit).all()
+    return materials
+
+# Products endpoints
+@app.post("/products/", response_model=schemas.Product)
+def create_product(product: schemas.ProductCreate, db: Session = Depends(get_db)):
+    db_product = models.Product(**product.dict())
+    db.add(db_product)
+    db.commit()
+    db.refresh(db_product)
+    return db_product
+
+@app.get("/products/", response_model=List[schemas.Product])
+def read_products(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    products = db.query(models.Product).offset(skip).limit(limit).all()
+    return products
+
+@app.get("/products/{product_id}", response_model=schemas.Product)
+def read_product(product_id: int, db: Session = Depends(get_db)):
+    product = db.query(models.Product).filter(models.Product.product_id == product_id).first()
+    if product is None:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return product
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
