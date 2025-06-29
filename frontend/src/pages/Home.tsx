@@ -71,6 +71,18 @@ const Home: React.FC = () => {
           </p>
         </div>
 
+        <Link
+          to="/egg-master"
+          className="group block p-6 bg-white border border-gray-200 rounded-lg shadow hover:shadow-lg transition-shadow"
+        >
+          <h3 className="text-xl font-semibold text-gray-900 group-hover:text-blue-600">
+            卵マスタ管理
+          </h3>
+          <p className="mt-2 text-gray-600">
+            卵の重量設定・管理
+          </p>
+        </Link>
+
         <div className="group block p-6 bg-white border border-gray-200 rounded-lg shadow">
           <h3 className="text-xl font-semibold text-gray-900">
             成分表示

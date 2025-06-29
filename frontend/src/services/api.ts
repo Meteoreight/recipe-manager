@@ -47,11 +47,11 @@ class ApiService {
 
   // Recipe Categories
   getRecipeCategories() {
-    return this.get('/recipe-categories/');
+    return this.get<any[]>('/recipe-categories/');
   }
 
   createRecipeCategory(data: any) {
-    return this.post('/recipe-categories/', data);
+    return this.post<any>('/recipe-categories/', data);
   }
 
   // Egg Master
@@ -77,37 +77,61 @@ class ApiService {
 
   // Ingredients
   getIngredients() {
-    return this.get('/ingredients/');
+    return this.get<any[]>('/ingredients/');
   }
 
   createIngredient(data: any) {
-    return this.post('/ingredients/', data);
+    return this.post<any>('/ingredients/', data);
   }
 
   getIngredient(id: number) {
-    return this.get(`/ingredients/${id}`);
+    return this.get<any>(`/ingredients/${id}`);
+  }
+
+  updateIngredient(id: number, data: any) {
+    return this.put<any>(`/ingredients/${id}`, data);
+  }
+
+  deleteIngredient(id: number) {
+    return this.delete<any>(`/ingredients/${id}`);
   }
 
   // Recipes
   getRecipes() {
-    return this.get('/recipes/');
+    return this.get<any[]>('/recipes/');
   }
 
   createRecipe(data: any) {
-    return this.post('/recipes/', data);
+    return this.post<any>('/recipes/', data);
   }
 
   getRecipe(id: number) {
-    return this.get(`/recipes/${id}`);
+    return this.get<any>(`/recipes/${id}`);
+  }
+
+  updateRecipe(id: number, data: any) {
+    return this.put<any>(`/recipes/${id}`, data);
+  }
+
+  deleteRecipe(id: number) {
+    return this.delete<any>(`/recipes/${id}`);
   }
 
   // Recipe Details
   getRecipeDetails(recipeId: number) {
-    return this.get(`/recipe-details/recipe/${recipeId}`);
+    return this.get<any[]>(`/recipes/${recipeId}/details`);
   }
 
   createRecipeDetail(data: any) {
-    return this.post('/recipe-details/', data);
+    return this.post<any>('/recipe-details/', data);
+  }
+
+  updateRecipeDetail(id: number, data: any) {
+    return this.put<any>(`/recipe-details/${id}`, data);
+  }
+
+  deleteRecipeDetail(id: number) {
+    return this.delete<any>(`/recipe-details/${id}`);
   }
 
   // Products

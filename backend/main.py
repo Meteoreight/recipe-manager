@@ -116,6 +116,30 @@ def read_ingredient(ingredient_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Ingredient not found")
     return ingredient
 
+@app.put("/ingredients/{ingredient_id}", response_model=schemas.Ingredient)
+def update_ingredient(ingredient_id: int, ingredient: schemas.IngredientUpdate, db: Session = Depends(get_db)):
+    db_ingredient = db.query(models.Ingredient).filter(models.Ingredient.ingredient_id == ingredient_id).first()
+    if db_ingredient is None:
+        raise HTTPException(status_code=404, detail="Ingredient not found")
+    
+    update_data = ingredient.dict(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(db_ingredient, field, value)
+    
+    db.commit()
+    db.refresh(db_ingredient)
+    return db_ingredient
+
+@app.delete("/ingredients/{ingredient_id}")
+def delete_ingredient(ingredient_id: int, db: Session = Depends(get_db)):
+    db_ingredient = db.query(models.Ingredient).filter(models.Ingredient.ingredient_id == ingredient_id).first()
+    if db_ingredient is None:
+        raise HTTPException(status_code=404, detail="Ingredient not found")
+    
+    db.delete(db_ingredient)
+    db.commit()
+    return {"message": "Ingredient deleted successfully"}
+
 # Purchase History endpoints
 @app.post("/purchase-history/", response_model=schemas.PurchaseHistory)
 def create_purchase_history(purchase: schemas.PurchaseHistoryCreate, db: Session = Depends(get_db)):
@@ -151,6 +175,38 @@ def read_recipe(recipe_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Recipe not found")
     return recipe
 
+@app.put("/recipes/{recipe_id}", response_model=schemas.Recipe)
+def update_recipe(recipe_id: int, recipe: schemas.RecipeUpdate, db: Session = Depends(get_db)):
+    db_recipe = db.query(models.Recipe).filter(models.Recipe.recipe_id == recipe_id).first()
+    if db_recipe is None:
+        raise HTTPException(status_code=404, detail="Recipe not found")
+    
+    update_data = recipe.dict(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(db_recipe, field, value)
+    
+    db.commit()
+    db.refresh(db_recipe)
+    return db_recipe
+
+@app.delete("/recipes/{recipe_id}")
+def delete_recipe(recipe_id: int, db: Session = Depends(get_db)):
+    db_recipe = db.query(models.Recipe).filter(models.Recipe.recipe_id == recipe_id).first()
+    if db_recipe is None:
+        raise HTTPException(status_code=404, detail="Recipe not found")
+    
+    # Delete associated recipe details first
+    db.query(models.RecipeDetail).filter(models.RecipeDetail.recipe_id == recipe_id).delete()
+    
+    db.delete(db_recipe)
+    db.commit()
+    return {"message": "Recipe deleted successfully"}
+
+@app.get("/recipes/{recipe_id}/details", response_model=List[schemas.RecipeDetail])
+def read_recipe_details(recipe_id: int, db: Session = Depends(get_db)):
+    details = db.query(models.RecipeDetail).filter(models.RecipeDetail.recipe_id == recipe_id).order_by(models.RecipeDetail.display_order).all()
+    return details
+
 # Recipe Details endpoints
 @app.post("/recipe-details/", response_model=schemas.RecipeDetail)
 def create_recipe_detail(detail: schemas.RecipeDetailCreate, db: Session = Depends(get_db)):
@@ -161,9 +217,47 @@ def create_recipe_detail(detail: schemas.RecipeDetailCreate, db: Session = Depen
     return db_detail
 
 @app.get("/recipe-details/recipe/{recipe_id}", response_model=List[schemas.RecipeDetail])
-def read_recipe_details(recipe_id: int, db: Session = Depends(get_db)):
+def read_recipe_details_alt(recipe_id: int, db: Session = Depends(get_db)):
     details = db.query(models.RecipeDetail).filter(models.RecipeDetail.recipe_id == recipe_id).order_by(models.RecipeDetail.display_order).all()
     return details
+
+@app.put("/recipe-details/{detail_id}", response_model=schemas.RecipeDetail)
+def update_recipe_detail(detail_id: int, detail: schemas.RecipeDetailUpdate, db: Session = Depends(get_db)):
+    db_detail = db.query(models.RecipeDetail).filter(models.RecipeDetail.id == detail_id).first()
+    if db_detail is None:
+        raise HTTPException(status_code=404, detail="Recipe detail not found")
+    
+    update_data = detail.dict(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(db_detail, field, value)
+    
+    db.commit()
+    db.refresh(db_detail)
+    return db_detail
+
+@app.delete("/recipe-details/{detail_id}")
+def delete_recipe_detail(detail_id: int, db: Session = Depends(get_db)):
+    db_detail = db.query(models.RecipeDetail).filter(models.RecipeDetail.id == detail_id).first()
+    if db_detail is None:
+        raise HTTPException(status_code=404, detail="Recipe detail not found")
+    
+    db.delete(db_detail)
+    db.commit()
+    return {"message": "Recipe detail deleted successfully"}
+
+# Recipe Categories endpoints
+@app.get("/recipe-categories/", response_model=List[schemas.RecipeCategory])
+def read_recipe_categories(db: Session = Depends(get_db)):
+    categories = db.query(models.RecipeCategory).all()
+    return categories
+
+@app.post("/recipe-categories/", response_model=schemas.RecipeCategory)
+def create_recipe_category(category: schemas.RecipeCategoryCreate, db: Session = Depends(get_db)):
+    db_category = models.RecipeCategory(**category.dict())
+    db.add(db_category)
+    db.commit()
+    db.refresh(db_category)
+    return db_category
 
 # Packaging Materials endpoints
 @app.post("/packaging-materials/", response_model=schemas.PackagingMaterial)
