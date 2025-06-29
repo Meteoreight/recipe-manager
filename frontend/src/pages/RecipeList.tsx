@@ -121,7 +121,12 @@ const RecipeList: React.FC = () => {
                 <tr key={recipe.recipe_id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
-                      {recipe.recipe_name}
+                      <Link
+                        to={`/recipes/${recipe.recipe_id}`}
+                        className="text-blue-600 hover:text-blue-900"
+                      >
+                        {recipe.recipe_name}
+                      </Link>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -142,6 +147,12 @@ const RecipeList: React.FC = () => {
                     {new Date(recipe.created_at).toLocaleDateString('ja-JP')}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                    <Link
+                      to={`/recipes/${recipe.recipe_id}`}
+                      className="text-green-600 hover:text-green-900"
+                    >
+                      詳細
+                    </Link>
                     <Link
                       to={`/recipes/${recipe.recipe_id}/edit`}
                       className="text-blue-600 hover:text-blue-900"

@@ -154,6 +154,37 @@ def read_purchase_history(skip: int = 0, limit: int = 100, db: Session = Depends
     purchases = db.query(models.PurchaseHistory).offset(skip).limit(limit).all()
     return purchases
 
+@app.get("/purchase-history/{purchase_id}", response_model=schemas.PurchaseHistory)
+def read_purchase_history_item(purchase_id: int, db: Session = Depends(get_db)):
+    purchase = db.query(models.PurchaseHistory).filter(models.PurchaseHistory.purchase_id == purchase_id).first()
+    if purchase is None:
+        raise HTTPException(status_code=404, detail="Purchase history not found")
+    return purchase
+
+@app.put("/purchase-history/{purchase_id}", response_model=schemas.PurchaseHistory)
+def update_purchase_history(purchase_id: int, purchase: schemas.PurchaseHistoryUpdate, db: Session = Depends(get_db)):
+    db_purchase = db.query(models.PurchaseHistory).filter(models.PurchaseHistory.purchase_id == purchase_id).first()
+    if db_purchase is None:
+        raise HTTPException(status_code=404, detail="Purchase history not found")
+    
+    update_data = purchase.dict(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(db_purchase, field, value)
+    
+    db.commit()
+    db.refresh(db_purchase)
+    return db_purchase
+
+@app.delete("/purchase-history/{purchase_id}")
+def delete_purchase_history(purchase_id: int, db: Session = Depends(get_db)):
+    db_purchase = db.query(models.PurchaseHistory).filter(models.PurchaseHistory.purchase_id == purchase_id).first()
+    if db_purchase is None:
+        raise HTTPException(status_code=404, detail="Purchase history not found")
+    
+    db.delete(db_purchase)
+    db.commit()
+    return {"message": "Purchase history deleted successfully"}
+
 # Recipes endpoints
 @app.post("/recipes/", response_model=schemas.Recipe)
 def create_recipe(recipe: schemas.RecipeCreate, db: Session = Depends(get_db)):

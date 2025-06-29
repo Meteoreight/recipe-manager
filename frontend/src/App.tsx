@@ -4,6 +4,7 @@ import Layout from './components/Layout';
 import Home from './pages/Home';
 import RecipeList from './pages/RecipeList';
 import RecipeForm from './pages/RecipeForm';
+import RecipeDetail from './pages/RecipeDetail';
 import IngredientList from './pages/IngredientList';
 import ProductList from './pages/ProductList';
 import PurchaseHistory from './pages/PurchaseHistory';
@@ -17,6 +18,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/recipes" element={<RecipeList />} />
           <Route path="/recipes/new" element={<RecipeForm />} />
+          <Route path="/recipes/:id" element={<RecipeDetail />} />
           <Route path="/recipes/:id/edit" element={<RecipeForm />} />
           <Route path="/ingredients" element={<IngredientList />} />
           <Route path="/products" element={<ProductList />} />

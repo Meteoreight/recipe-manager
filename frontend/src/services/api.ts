@@ -149,11 +149,19 @@ class ApiService {
 
   // Purchase History
   getPurchaseHistory() {
-    return this.get('/purchase-history/');
+    return this.get<any[]>('/purchase-history/');
   }
 
   createPurchaseHistory(data: any) {
-    return this.post('/purchase-history/', data);
+    return this.post<any>('/purchase-history/', data);
+  }
+
+  updatePurchaseHistory(id: number, data: any) {
+    return this.put<any>(`/purchase-history/${id}`, data);
+  }
+
+  deletePurchaseHistory(id: number) {
+    return this.delete<any>(`/purchase-history/${id}`);
   }
 
   // Packaging Materials
