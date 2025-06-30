@@ -212,18 +212,6 @@ cd backend
 pytest
 ```
 
-## 📊 システム要件
-
-### 最小要件
-- CPU: 2コア
-- メモリ: 4GB RAM
-- ストレージ: 10GB
-
-### 推奨要件
-- CPU: 4コア以上
-- メモリ: 8GB RAM以上
-- ストレージ: 50GB以上（データ増加に対応）
-
 ## 🔐 セキュリティ
 
 - **データバリデーション**: Pydanticによる厳密な入力検証
@@ -241,26 +229,6 @@ FastAPIの自動生成ドキュメントを http://localhost:8000/docs で確認
 - `GET /products/` - 製品一覧取得
 - `POST /recipes/batch-details` - バッチレシピ詳細取得
 - `GET /purchase-history/` - 仕入れ履歴取得
-
-## 🤝 貢献
-
-1. このリポジトリをフォーク
-2. 機能ブランチを作成 (`git checkout -b feature/amazing-feature`)
-3. 変更をコミット (`git commit -m 'Add amazing feature'`)
-4. ブランチにプッシュ (`git push origin feature/amazing-feature`)
-5. プルリクエストを作成
-
-## 📝 ライセンス
-
-このプロジェクトは MIT ライセンスの下で公開されています。
-
-## 🆘 サポート
-
-問題や質問がある場合は、以下の方法でサポートを受けられます：
-
-- **Issues**: GitHubのIssuesタブで問題を報告
-- **ドキュメント**: `/docs` フォルダの詳細ドキュメントを参照
-- **API仕様**: http://localhost:8000/docs のSwagger UI
 
 ## 🔄 更新履歴
 
