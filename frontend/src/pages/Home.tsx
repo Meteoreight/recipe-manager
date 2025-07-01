@@ -62,14 +62,17 @@ const Home: React.FC = () => {
           </p>
         </Link>
 
-        <div className="group block p-6 bg-white border border-gray-200 rounded-lg shadow">
-          <h3 className="text-xl font-semibold text-gray-900">
+        <Link
+          to="/cost-calculation"
+          className="group block p-6 bg-white border border-gray-200 rounded-lg shadow hover:shadow-lg transition-shadow"
+        >
+          <h3 className="text-xl font-semibold text-gray-900 group-hover:text-blue-600">
             原価計算
           </h3>
           <p className="mt-2 text-gray-600">
             リアルタイム原価計算・価格分析
           </p>
-        </div>
+        </Link>
 
         <Link
           to="/egg-master"
