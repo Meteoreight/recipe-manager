@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { apiService } from '../services/api';
 import { Recipe, RecipeDetail, Ingredient, RecipeCategory, EggMaster } from '../types';
+import RecipeCostSummary from './RecipeCostSummary';
+import RecipeReferencePane from './RecipeReferencePane';
 
 const RecipeForm: React.FC = () => {
   const navigate = useNavigate();
@@ -190,18 +192,21 @@ const RecipeForm: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">
-          {isEdit ? 'レシピ編集' : 'レシピ作成'}
-        </h1>
-        <button
-          onClick={() => navigate('/recipes')}
-          className="text-gray-600 hover:text-gray-900"
-        >
-          一覧に戻る
-        </button>
-      </div>
+    <div className="flex h-screen">
+      {/* Left Column - Recipe Form */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="p-6 space-y-6">
+          <div className="flex justify-between items-center">
+            <h1 className="text-2xl font-bold text-gray-900">
+              {isEdit ? 'レシピ編集' : 'レシピ作成'}
+            </h1>
+            <button
+              onClick={() => navigate('/recipes')}
+              className="text-gray-600 hover:text-gray-900"
+            >
+              一覧に戻る
+            </button>
+          </div>
 
       {errors.submit && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
@@ -389,6 +394,15 @@ const RecipeForm: React.FC = () => {
           </div>
         </div>
 
+        {/* Cost Information */}
+        <RecipeCostSummary
+          recipeDetails={recipeDetails}
+          batchSize={formData.batch_size}
+          batchUnit={formData.batch_unit}
+          yieldPerBatch={formData.yield_per_batch}
+          yieldUnit={formData.yield_unit}
+        />
+
         {/* Recipe Ingredients */}
         <div className="bg-white shadow sm:rounded-lg">
           <div className="px-4 py-5 sm:p-6">
@@ -533,6 +547,11 @@ const RecipeForm: React.FC = () => {
           </button>
         </div>
       </form>
+        </div>
+      </div>
+
+      {/* Right Column - Reference Pane */}
+      <RecipeReferencePane currentRecipeId={isEdit ? Number(id) : undefined} />
     </div>
   );
 };

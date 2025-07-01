@@ -20,7 +20,7 @@ const CostCalculationPage: React.FC = () => {
     const fetchRecipes = async () => {
       try {
         const recipesData = await apiService.getRecipes();
-        setRecipes(recipesData);
+        setRecipes(recipesData as Recipe[]);
       } catch (error) {
         console.error('Error fetching recipes:', error);
         setError('レシピの取得中にエラーが発生しました。');
