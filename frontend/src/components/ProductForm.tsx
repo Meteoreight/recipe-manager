@@ -34,8 +34,8 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel }) 
           apiService.getRecipes(),
           apiService.getPackagingMaterials()
         ]);
-        setRecipes(recipesData);
-        setPackagingMaterials(packagingData);
+        setRecipes(recipesData as Recipe[]);
+        setPackagingMaterials(packagingData as PackagingMaterial[]);
       } catch (error) {
         console.error('Error fetching data:', error);
         setError('データの取得に失敗しました。');

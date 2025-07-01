@@ -29,9 +29,9 @@ const ProductList: React.FC = () => {
         apiService.getRecipes(),
         apiService.getPackagingMaterials()
       ]);
-      setProducts(productsData);
-      setRecipes(recipesData);
-      setPackagingMaterials(packagingData);
+      setProducts(productsData as Product[]);
+      setRecipes(recipesData as Recipe[]);
+      setPackagingMaterials(packagingData as PackagingMaterial[]);
 
       // Calculate recipe costs for profit margin display
       await calculateRecipeCosts(productsData as Product[], recipesData as Recipe[]);

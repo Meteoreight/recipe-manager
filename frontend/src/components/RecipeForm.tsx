@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { apiService } from '../services/api';
 import { Recipe, RecipeDetail, Ingredient, RecipeCategory, EggMaster } from '../types';
+import RecipeCostSummary from './RecipeCostSummary';
 
 const RecipeForm: React.FC = () => {
   const navigate = useNavigate();
@@ -388,6 +389,15 @@ const RecipeForm: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Cost Information */}
+        <RecipeCostSummary
+          recipeDetails={recipeDetails}
+          batchSize={formData.batch_size}
+          batchUnit={formData.batch_unit}
+          yieldPerBatch={formData.yield_per_batch}
+          yieldUnit={formData.yield_unit}
+        />
 
         {/* Recipe Ingredients */}
         <div className="bg-white shadow sm:rounded-lg">
