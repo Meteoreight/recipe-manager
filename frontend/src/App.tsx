@@ -11,6 +11,7 @@ import IngredientList from './pages/IngredientList';
 import ProductList from './pages/ProductList';
 import ProductDetail from './pages/ProductDetail';
 import PurchaseHistory from './pages/PurchaseHistory';
+import CostCalculationPage from './pages/CostCalculationPage';
 import EggMasterList from './components/EggMasterList';
 import NotificationContainer from './components/NotificationContainer';
 import GlobalLoading from './components/GlobalLoading';
@@ -31,6 +32,7 @@ function App() {
             <Route path="/products" element={<ProductList />} />
             <Route path="/products/:id" element={<ProductDetail />} />
             <Route path="/purchase-history" element={<PurchaseHistory />} />
+            <Route path="/cost-calculation" element={<CostCalculationPage />} />
             <Route path="/egg-master" element={<EggMasterList />} />
           </Routes>
         </Layout>
