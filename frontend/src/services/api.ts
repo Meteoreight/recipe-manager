@@ -117,6 +117,10 @@ class ApiService {
     return this.delete<any>(`/recipes/${id}`);
   }
 
+  duplicateRecipe(id: number, newRecipeName: string) {
+    return this.post<any>(`/recipes/${id}/duplicate`, { new_recipe_name: newRecipeName });
+  }
+
   // Recipe Details
   getRecipeDetails(recipeId: number) {
     return this.get<any[]>(`/recipes/${recipeId}/details`);

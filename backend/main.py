@@ -233,6 +233,51 @@ def delete_recipe(recipe_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"message": "Recipe deleted successfully"}
 
+@app.post("/recipes/{recipe_id}/duplicate", response_model=schemas.Recipe)
+def duplicate_recipe(recipe_id: int, duplicate_data: schemas.RecipeDuplicate, db: Session = Depends(get_db)):
+    # Get the original recipe
+    original_recipe = db.query(models.Recipe).filter(models.Recipe.recipe_id == recipe_id).first()
+    if original_recipe is None:
+        raise HTTPException(status_code=404, detail="Recipe not found")
+    
+    # Get original recipe details
+    original_details = db.query(models.RecipeDetail).filter(models.RecipeDetail.recipe_id == recipe_id).all()
+    
+    # Create new recipe with copied data
+    new_recipe_data = {
+        "recipe_name": duplicate_data.new_recipe_name,
+        "category_id": original_recipe.category_id,
+        "version": 1,  # Reset version to 1 for new recipe
+        "complexity": original_recipe.complexity,
+        "effort": original_recipe.effort,
+        "batch_size": original_recipe.batch_size,
+        "batch_unit": original_recipe.batch_unit,
+        "yield_per_batch": original_recipe.yield_per_batch,
+        "yield_unit": original_recipe.yield_unit,
+        "status": "draft"  # New recipe starts as draft
+    }
+    
+    db_new_recipe = models.Recipe(**new_recipe_data)
+    db.add(db_new_recipe)
+    db.commit()
+    db.refresh(db_new_recipe)
+    
+    # Copy recipe details
+    for original_detail in original_details:
+        new_detail_data = {
+            "recipe_id": db_new_recipe.recipe_id,
+            "ingredient_id": original_detail.ingredient_id,
+            "usage_amount": original_detail.usage_amount,
+            "usage_unit": original_detail.usage_unit,
+            "display_order": original_detail.display_order,
+            "egg_type": original_detail.egg_type
+        }
+        db_new_detail = models.RecipeDetail(**new_detail_data)
+        db.add(db_new_detail)
+    
+    db.commit()
+    return db_new_recipe
+
 @app.get("/recipes/{recipe_id}/details", response_model=List[schemas.RecipeDetail])
 def read_recipe_details(recipe_id: int, db: Session = Depends(get_db)):
     details = db.query(models.RecipeDetail).filter(models.RecipeDetail.recipe_id == recipe_id).order_by(models.RecipeDetail.display_order).all()
