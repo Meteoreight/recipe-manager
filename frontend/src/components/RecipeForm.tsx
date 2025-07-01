@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { apiService } from '../services/api';
 import { Recipe, RecipeDetail, Ingredient, RecipeCategory, EggMaster } from '../types';
 import RecipeCostSummary from './RecipeCostSummary';
@@ -8,7 +8,9 @@ import RecipeReferencePane from './RecipeReferencePane';
 const RecipeForm: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
   const isEdit = Boolean(id);
+  const duplicateFrom = searchParams.get('duplicateFrom');
 
   const [formData, setFormData] = useState({
     recipe_name: '',
@@ -64,6 +66,33 @@ const RecipeForm: React.FC = () => {
           });
 
           setRecipeDetails(details);
+        } else if (duplicateFrom && !isEdit) {
+          // Load data from recipe to duplicate
+          const [recipe, details] = await Promise.all([
+            apiService.getRecipe(Number(duplicateFrom)),
+            apiService.getRecipeDetails(Number(duplicateFrom))
+          ]);
+
+          setFormData({
+            recipe_name: `${recipe.recipe_name} (コピー)`,
+            category_id: recipe.category_id?.toString() || '',
+            version: 1,
+            complexity: recipe.complexity?.toString() || '',
+            effort: recipe.effort?.toString() || '',
+            batch_size: recipe.batch_size,
+            batch_unit: recipe.batch_unit,
+            yield_per_batch: recipe.yield_per_batch,
+            yield_unit: recipe.yield_unit,
+            status: 'draft'
+          });
+
+          // Clear IDs for recipe details since this is a new recipe
+          const newDetails = details.map(detail => ({
+            ...detail,
+            id: 0,
+            recipe_id: 0
+          }));
+          setRecipeDetails(newDetails);
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -74,7 +103,7 @@ const RecipeForm: React.FC = () => {
     };
 
     fetchData();
-  }, [isEdit, id]);
+  }, [isEdit, id, duplicateFrom]);
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
@@ -198,7 +227,7 @@ const RecipeForm: React.FC = () => {
         <div className="p-6 space-y-6">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold text-gray-900">
-              {isEdit ? 'レシピ編集' : 'レシピ作成'}
+              {isEdit ? 'レシピ編集' : duplicateFrom ? 'レシピ複製作成' : 'レシピ作成'}
             </h1>
             <button
               onClick={() => navigate('/recipes')}

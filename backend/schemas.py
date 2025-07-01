@@ -115,6 +115,9 @@ class RecipeUpdate(RecipeBase):
     batch_size: Optional[int] = Field(None, gt=0)
     yield_per_batch: Optional[int] = Field(None, gt=0)
 
+class RecipeDuplicate(BaseModel):
+    new_recipe_name: str = Field(..., max_length=200)
+
 class Recipe(RecipeBase):
     recipe_id: int
     created_at: datetime

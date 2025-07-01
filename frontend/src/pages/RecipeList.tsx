@@ -38,6 +38,24 @@ const RecipeList: React.FC = () => {
     }
   };
 
+  const handleDuplicate = async (recipe: Recipe) => {
+    const newRecipeName = window.prompt(
+      'レシピ名を入力してください',
+      `${recipe.recipe_name} (コピー)`
+    );
+    
+    if (newRecipeName && newRecipeName.trim()) {
+      try {
+        await apiService.duplicateRecipe(recipe.recipe_id, newRecipeName.trim());
+        await fetchRecipes();
+        setError('');
+      } catch (error) {
+        console.error('Error duplicating recipe:', error);
+        setError('レシピの複製に失敗しました。もう一度お試しください。');
+      }
+    }
+  };
+
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'draft': return '下書き';
@@ -158,6 +176,18 @@ const RecipeList: React.FC = () => {
                       className="text-blue-600 hover:text-blue-900"
                     >
                       編集
+                    </Link>
+                    <button
+                      onClick={() => handleDuplicate(recipe)}
+                      className="text-purple-600 hover:text-purple-900"
+                    >
+                      複製
+                    </button>
+                    <Link
+                      to={`/recipes/new?duplicateFrom=${recipe.recipe_id}`}
+                      className="text-indigo-600 hover:text-indigo-900"
+                    >
+                      複製作成
                     </Link>
                     <button
                       onClick={() => handleDelete(recipe.recipe_id)}
